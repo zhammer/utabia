@@ -10,10 +10,22 @@ interface FloatingTabProps {
   y: number
   onGone: () => void
   onClosed: () => void
+  onRegister: (handle: { hit: () => void }) => void
 }
 
-export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed }: FloatingTabProps) {
+export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed, onRegister }: FloatingTabProps) {
   const [state, send] = useMachine(floatingTabMachine)
+
+  // Register hit handler
+  useEffect(() => {
+    onRegister({
+      hit: () => {
+        if (state.matches('hovering')) {
+          send({ type: 'HIT' })
+        }
+      }
+    })
+  }, [onRegister, send, state])
 
   useEffect(() => {
     if (state.matches('gone')) {
@@ -22,13 +34,6 @@ export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed }:
       onClosed()
     }
   }, [state.value, onGone, onClosed])
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (state.matches('hovering')) {
-      send({ type: 'HIT' })
-    }
-  }
 
   const isDisintegrating = state.matches('disintegrating')
   const isFadingOut = state.matches('fadingOut')
@@ -44,7 +49,6 @@ export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed }:
         left: `${x * 100}%`,
         top: `${y * 100}%`,
       }}
-      onClick={handleClick}
       data-instance-id={instanceId}
     >
       <div className="tab-content">

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, forwardRef, useImperativeHandle, useRef } from 'react'
 import { useMachine } from '@xstate/react'
 import { appMachine, VisibleTab } from '../machines/appMachine'
 import { useTabs } from '../hooks/useTabs'
@@ -8,9 +8,20 @@ interface TabFieldProps {
   onShoot: (x: number, y: number, targetInstanceId?: string) => void
 }
 
-export default function TabField({ onShoot }: TabFieldProps) {
+export interface TabFieldHandle {
+  hitTab: (instanceId: string) => void
+}
+
+const TabField = forwardRef<TabFieldHandle, TabFieldProps>(({ onShoot }, ref) => {
   const { tabs, closeTab } = useTabs()
   const [state, send] = useMachine(appMachine)
+  const floatingTabRefs = useRef<Map<string, { hit: () => void }>>(new Map())
+
+  useImperativeHandle(ref, () => ({
+    hitTab: (instanceId: string) => {
+      floatingTabRefs.current.get(instanceId)?.hit()
+    }
+  }), [])
 
   // Sync tabs with machine
   useEffect(() => {
@@ -30,13 +41,19 @@ export default function TabField({ onShoot }: TabFieldProps) {
   }, [onShoot])
 
   const handleTabGone = useCallback((instanceId: string) => {
+    floatingTabRefs.current.delete(instanceId)
     send({ type: 'TAB_GONE', instanceId })
   }, [send])
 
   const handleTabClosed = useCallback((instanceId: string, tabId: number) => {
+    floatingTabRefs.current.delete(instanceId)
     closeTab(tabId)
     send({ type: 'TAB_CLOSED', instanceId, tabId })
   }, [send, closeTab])
+
+  const registerFloatingTab = useCallback((instanceId: string, handle: { hit: () => void }) => {
+    floatingTabRefs.current.set(instanceId, handle)
+  }, [])
 
   return (
     <div className="tab-field" onClick={handleClick}>
@@ -49,8 +66,13 @@ export default function TabField({ onShoot }: TabFieldProps) {
           y={vTab.y}
           onGone={() => handleTabGone(vTab.instanceId)}
           onClosed={() => handleTabClosed(vTab.instanceId, vTab.id)}
+          onRegister={(handle) => registerFloatingTab(vTab.instanceId, handle)}
         />
       ))}
     </div>
   )
-}
+})
+
+TabField.displayName = 'TabField'
+
+export default TabField
