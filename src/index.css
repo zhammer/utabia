@@ -161,3 +161,11 @@ html, body, #root {
   z-index: 1;
   cursor: crosshair;
 }
+
+.laser {
+  position: fixed;
+  width: 30px;
+  height: 6px;
+  z-index: 100;
+  pointer-events: none;
+}
