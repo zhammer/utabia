@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Tabs",
+  "version": "1.0.0",
+  "description": "A meditative experience for closing browser tabs",
+  "permissions": ["tabs"],
+  "action": {
+    "default_title": "Open Tabs"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
