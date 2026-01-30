@@ -1,3 +1,9 @@
+import WavesBackground from './components/WavesBackground'
+
 export default function App() {
-  return <div>Tabs</div>
+  return (
+    <div className="app">
+      <WavesBackground />
+    </div>
+  )
 }
