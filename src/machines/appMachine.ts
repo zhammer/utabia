@@ -13,6 +13,7 @@ export interface AppContext {
   queue: TabInfo[];
   visible: VisibleTab[];
   maxVisible: number;
+  hasHadTabs: boolean;
 }
 
 export type AppEvent =
@@ -21,7 +22,8 @@ export type AppEvent =
   | { type: "REMOVE_TAB"; tabId: number }
   | { type: "SPAWN_TAB" }
   | { type: "TAB_GONE"; instanceId: string }
-  | { type: "TAB_CLOSED"; instanceId: string; tabId: number };
+  | { type: "TAB_CLOSED"; instanceId: string; tabId: number }
+  | { type: "SHOW_MESSAGE" };
 
 function randomPosition(existingTabs: VisibleTab[]) {
   const paddingX = 0.1;
@@ -74,6 +76,13 @@ const spawnTimerLogic = fromCallback(({ sendBack }) => {
   return () => clearInterval(interval);
 });
 
+const utabiaTimerLogic = fromCallback(({ sendBack }) => {
+  const timeout = setTimeout(() => {
+    sendBack({ type: "SHOW_MESSAGE" });
+  }, 5e3);
+  return () => clearTimeout(timeout);
+});
+
 export const appMachine = createMachine({
   id: "app",
   initial: "running",
@@ -81,6 +90,7 @@ export const appMachine = createMachine({
     queue: [],
     visible: [],
     maxVisible: 4,
+    hasHadTabs: false,
   } as AppContext,
   states: {
     running: {
@@ -88,11 +98,20 @@ export const appMachine = createMachine({
         id: "spawnTimer",
         src: spawnTimerLogic,
       },
+      always: {
+        target: "utabia",
+        guard: ({ context }) =>
+          context.hasHadTabs &&
+          context.queue.length === 0 &&
+          context.visible.length === 0,
+      },
       on: {
         SET_TABS: {
           actions: assign({
             queue: ({ event }) =>
               [...event.tabs].sort(() => Math.random() - 0.5),
+            hasHadTabs: ({ context, event }) =>
+              context.hasHadTabs || event.tabs.length > 0,
           }),
         },
         ADD_TAB: {
@@ -156,6 +175,31 @@ export const appMachine = createMachine({
               context.queue.filter((t) => t.id !== event.tabId),
           }),
         },
+      },
+    },
+    utabia: {
+      initial: "waiting",
+      on: {
+        SET_TABS: {
+          target: "running",
+          guard: ({ event }) => event.tabs.length > 0,
+          actions: assign({
+            queue: ({ event }) =>
+              [...event.tabs].sort(() => Math.random() - 0.5),
+          }),
+        },
+      },
+      states: {
+        waiting: {
+          invoke: {
+            id: "utabiaTimer",
+            src: utabiaTimerLogic,
+          },
+          on: {
+            SHOW_MESSAGE: "showingMessage",
+          },
+        },
+        showingMessage: {},
       },
     },
   },
