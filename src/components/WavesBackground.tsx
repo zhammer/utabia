@@ -1,18 +1,43 @@
+import { useRef, useState, useEffect } from 'react'
+
 interface WavesBackgroundProps {
   onReady?: () => void
 }
 
 export default function WavesBackground({ onReady }: WavesBackgroundProps) {
-  const videoId = 'bn9F19Hi1Lk'
-  const startTime = 3600 // 1 hour in seconds
+  const basePath = import.meta.env.BASE_URL || './'
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isMuted, setIsMuted] = useState(true)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = 0.5
+    }
+  }, [])
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted
+      setIsMuted(videoRef.current.muted)
+    }
+  }
 
   return (
-    <div className="waves-background">
-      <iframe
-        src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&start=${startTime}&controls=0&rel=0&modestbranding=1&iv_load_policy=3`}
-        allow="autoplay"
-        onLoad={onReady}
-      />
-    </div>
+    <>
+      <div className="waves-background">
+        <video
+          ref={videoRef}
+          src={`${basePath}waves-background.mp4`}
+          autoPlay
+          muted
+          loop
+          playsInline
+          onCanPlay={onReady}
+        />
+      </div>
+      <button className="audio-toggle" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
+        {isMuted ? '🔇' : '🔊'}
+      </button>
+    </>
   )
 }
