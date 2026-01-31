@@ -48,18 +48,31 @@ html, body, #root {
   right: 16px;
   z-index: 100;
   pointer-events: auto;
-  background: rgba(0, 0, 0, 0.5);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 20px;
+  background: transparent;
+  border: none;
+  padding: 4px;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  color: white;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
 .audio-toggle:hover {
-  background: rgba(0, 0, 0, 0.7);
-  border-color: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+}
+
+.speaker-icon {
+  width: 64px;
+  height: 64px;
+  display: block;
+  transform: scaleX(-1);
+  clip-path: inset(0 45% 0 0);
+  transition: clip-path 0.2s;
+}
+
+.speaker-icon.on,
+.audio-toggle:hover .speaker-icon:not(.on) {
+  clip-path: inset(0 0 0 0);
 }
 
 .entry-screen {
