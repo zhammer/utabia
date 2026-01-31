@@ -6,7 +6,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "dev": "vite --port 5173 --open app.html",
+    "dev": "vite --port 5173 --open /app.html",
     "dev:landing": "vite --port 5174",
     "build": "tsc && vite build",
     "build:extension": "tsc && vite build && rm -rf dist-extension && mkdir dist-extension && cp dist/app.html dist/background.js dist/manifest.json dist-extension/ && cp -r dist/assets dist-extension/ && cp dist/icon-*.png dist-extension/ && cd dist-extension && zip -r ../utabia-extension.zip .",
