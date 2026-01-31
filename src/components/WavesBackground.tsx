@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useAudio } from '../contexts/AudioContext'
 import { getAssetUrl } from '../config'
 
@@ -6,10 +6,10 @@ interface WavesBackgroundProps {
   onReady?: () => void
 }
 
-function SpeakerIcon({ isOn }: { isOn: boolean }) {
+function SpeakerIcon({ isOn, pulse }: { isOn: boolean; pulse: boolean }) {
   return (
     <svg
-      className={`speaker-icon ${isOn ? 'on' : ''}`}
+      className={`speaker-icon ${isOn ? 'on' : ''} ${pulse ? 'pulse' : ''}`}
       width="32"
       height="32"
       viewBox="0 0 1200 1200"
@@ -25,6 +25,8 @@ function SpeakerIcon({ isOn }: { isOn: boolean }) {
 export default function WavesBackground({ onReady }: WavesBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const { isMuted, setIsMuted } = useAudio()
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [isPulsing, setIsPulsing] = useState(false)
 
   useEffect(() => {
     if (videoRef.current) {
@@ -38,7 +40,28 @@ export default function WavesBackground({ onReady }: WavesBackgroundProps) {
     }
   }, [isMuted])
 
+  // Pulse animation after 5 seconds if user hasn't interacted
+  useEffect(() => {
+    if (hasInteracted) return
+
+    const timer = setTimeout(() => {
+      if (!hasInteracted) {
+        setIsPulsing(true)
+        // Stop pulsing after animation completes (2 pulses)
+        setTimeout(() => setIsPulsing(false), 1600)
+      }
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [hasInteracted])
+
+  const handleInteraction = () => {
+    setHasInteracted(true)
+    setIsPulsing(false)
+  }
+
   const toggleMute = () => {
+    handleInteraction()
     setIsMuted(!isMuted)
   }
 
@@ -55,8 +78,13 @@ export default function WavesBackground({ onReady }: WavesBackgroundProps) {
           onCanPlay={onReady}
         />
       </div>
-      <button className="audio-toggle" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
-        <SpeakerIcon isOn={!isMuted} />
+      <button
+        className="audio-toggle"
+        onClick={toggleMute}
+        onMouseEnter={handleInteraction}
+        title={isMuted ? 'Unmute' : 'Mute'}
+      >
+        <SpeakerIcon isOn={!isMuted} pulse={isPulsing} />
       </button>
     </>
   )
