@@ -10,7 +10,7 @@ interface FloatingTabProps {
   y: number
   onGone: () => void
   onClosed: () => void
-  onRegister: (handle: { hit: () => void }) => void
+  onRegister: (handle: { hit: () => boolean }) => void
 }
 
 export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed, onRegister }: FloatingTabProps) {
@@ -22,7 +22,9 @@ export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed, o
       hit: () => {
         if (state.matches('hovering')) {
           send({ type: 'HIT' })
+          return true
         }
+        return false
       }
     })
   }, [onRegister, send, state])

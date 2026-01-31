@@ -9,17 +9,17 @@ interface TabFieldProps {
 }
 
 export interface TabFieldHandle {
-  hitTab: (instanceId: string) => void
+  hitTab: (instanceId: string) => boolean
 }
 
 const TabField = forwardRef<TabFieldHandle, TabFieldProps>(({ onShoot }, ref) => {
   const { tabs, closeTab } = useTabs()
   const [state, send] = useMachine(appMachine)
-  const floatingTabRefs = useRef<Map<string, { hit: () => void }>>(new Map())
+  const floatingTabRefs = useRef<Map<string, { hit: () => boolean }>>(new Map())
 
   useImperativeHandle(ref, () => ({
     hitTab: (instanceId: string) => {
-      floatingTabRefs.current.get(instanceId)?.hit()
+      return floatingTabRefs.current.get(instanceId)?.hit() ?? false
     }
   }), [])
 
@@ -51,7 +51,7 @@ const TabField = forwardRef<TabFieldHandle, TabFieldProps>(({ onShoot }, ref) =>
     send({ type: 'TAB_CLOSED', instanceId, tabId })
   }, [send, closeTab])
 
-  const registerFloatingTab = useCallback((instanceId: string, handle: { hit: () => void }) => {
+  const registerFloatingTab = useCallback((instanceId: string, handle: { hit: () => boolean }) => {
     floatingTabRefs.current.set(instanceId, handle)
   }, [])
 

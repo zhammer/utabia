@@ -12,7 +12,7 @@ interface Laser {
 }
 
 interface LaserManagerProps {
-  onHit: (instanceId: string) => void
+  onHit: (instanceId: string) => boolean
   children: (shoot: (x: number, y: number, targetInstanceId?: string) => void) => React.ReactNode
 }
 
@@ -56,8 +56,10 @@ export default function LaserManager({ onHit, children }: LaserManagerProps) {
 
   const handleLaserHit = useCallback((laser: Laser) => {
     if (laser.targetInstanceId) {
-      onHit(laser.targetInstanceId)
-      playCrunch()
+      const wasHit = onHit(laser.targetInstanceId)
+      if (wasHit) {
+        playCrunch()
+      }
     }
   }, [onHit, playCrunch])
 
