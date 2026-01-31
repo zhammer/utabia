@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useAudio } from '../contexts/AudioContext'
 import { getAssetUrl } from '../config'
 
