@@ -1,63 +1,66 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface LaserEffectProps {
-  startX: number
-  startY: number
   targetX: number
   targetY: number
   color: string
+  onHit: () => void
   onComplete: () => void
 }
 
-export default function LaserEffect({ startX, startY, targetX, targetY, color, onComplete }: LaserEffectProps) {
-  const [position, setPosition] = useState({ x: startX, y: startY })
+export default function LaserEffect({ targetX, targetY, color, onHit, onComplete }: LaserEffectProps) {
+  const [progress, setProgress] = useState(0)
+  const hasHitRef = useRef(false)
 
-  // Calculate angle for 3D perspective effect
-  const dx = targetX - startX
-  const dy = targetY - startY
-  const angle = Math.atan2(dy, dx) * (180 / Math.PI)
-
-  // Calculate distance for animation
-  const distance = Math.sqrt(dx * dx + dy * dy)
-  const duration = Math.min(300, distance * 0.3) // ms, faster for closer targets
+  const totalDuration = 600 // ms total animation
+  const hitAt = 0.4 // hit happens 40% through (~240ms delay)
 
   useEffect(() => {
-    // Animate to target
     const startTime = performance.now()
+    let animationId: number
 
-    const animate = (currentTime: number) => {
+    const tick = (currentTime: number) => {
       const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / duration, 1)
+      const p = Math.min(elapsed / totalDuration, 1)
+      // Ease out for smooth fade
+      const eased = 1 - Math.pow(1 - p, 2)
 
-      // Ease out
-      const eased = 1 - Math.pow(1 - progress, 2)
+      setProgress(eased)
 
-      setPosition({
-        x: startX + dx * eased,
-        y: startY + dy * eased
-      })
+      // Trigger hit partway through to simulate depth
+      if (p >= hitAt && !hasHitRef.current) {
+        hasHitRef.current = true
+        onHit()
+      }
 
-      if (progress < 1) {
-        requestAnimationFrame(animate)
+      if (p >= 1) {
+        onComplete()
       } else {
-        setTimeout(onComplete, 50)
+        animationId = requestAnimationFrame(tick)
       }
     }
 
-    requestAnimationFrame(animate)
-  }, [startX, startY, targetX, targetY, dx, dy, duration, onComplete])
+    animationId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(animationId)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 3D skew based on angle - more vertical = more skew
-  const skewAmount = Math.abs(Math.cos(angle * Math.PI / 180)) * 30
+  // Start at full size, shrink to nothing
+  const scale = 1 - progress
+  // Fade out as it shrinks
+  const opacity = 1 - progress
+
+  const glowSize = 15 * scale
 
   return (
     <div
       className="laser"
       style={{
-        left: position.x,
-        top: position.y,
+        left: targetX,
+        top: targetY,
         backgroundColor: color,
-        transform: `translate(-50%, -50%) rotate(${angle}deg) perspective(100px) rotateX(${skewAmount}deg)`,
+        boxShadow: `0 0 ${glowSize}px ${color}, 0 0 ${glowSize * 2}px ${color}`,
+        transform: `translate(-50%, -50%) scale(${scale})`,
+        opacity,
       }}
     />
   )
