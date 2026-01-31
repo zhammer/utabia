@@ -1,21 +1,24 @@
 {
   "manifest_version": 3,
-  "name": "Tabs",
+  "name": "Utabia",
   "version": "1.0.0",
-  "description": "A meditative experience for closing browser tabs",
+  "description": "The modern way to clear tabs.",
   "permissions": ["tabs"],
   "action": {
-    "default_title": "Open Tabs"
+    "default_title": "Open Utabia",
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
   },
   "background": {
     "service_worker": "background.js",
     "type": "module"
-  },
-  "host_permissions": [
-    "https://www.youtube.com/*",
-    "https://www.youtube-nocookie.com/*"
-  ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com"
   }
 }

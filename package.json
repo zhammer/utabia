@@ -6,7 +6,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5173",
+    "dev:landing": "vite --port 5174",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 import { useAudio } from '../contexts/AudioContext'
+import { getAssetUrl } from '../config'
 
 interface UtabiaSceneProps {
   isExiting?: boolean
 }
 
 export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
-  const basePath = import.meta.env.BASE_URL || './'
   const [isVisible, setIsVisible] = useState(false)
   const [showTitle, setShowTitle] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -21,7 +21,7 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
     const titleTimer = setTimeout(() => setShowTitle(true), 15100)
 
     // Start playing music
-    const audio = new Audio(`${basePath}piano%20shop%20in%20san%20sebastian.m4a`)
+    const audio = new Audio(getAssetUrl('piano%20shop%20in%20san%20sebastian.m4a'))
     audio.loop = true
     audio.volume = 0
     audioRef.current = audio
@@ -43,7 +43,7 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
         audioRef.current = null
       }
     }
-  }, [basePath])
+  }, [])
 
   // Handle mute state changes
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
             </div>
           </div>
           <img
-            src={`${basePath}raye.gif`}
+            src={getAssetUrl('raye.gif')}
             alt="Raye"
             className="utabia-raye"
           />

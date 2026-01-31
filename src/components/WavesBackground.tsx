@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { useAudio } from '../contexts/AudioContext'
+import { getAssetUrl } from '../config'
 
 interface WavesBackgroundProps {
   onReady?: () => void
@@ -22,7 +23,6 @@ function SpeakerIcon({ isOn }: { isOn: boolean }) {
 }
 
 export default function WavesBackground({ onReady }: WavesBackgroundProps) {
-  const basePath = import.meta.env.BASE_URL || './'
   const videoRef = useRef<HTMLVideoElement>(null)
   const { isMuted, setIsMuted } = useAudio()
 
@@ -47,7 +47,7 @@ export default function WavesBackground({ onReady }: WavesBackgroundProps) {
       <div className="waves-background">
         <video
           ref={videoRef}
-          src={`${basePath}waves-background.mp4`}
+          src={getAssetUrl('waves-background.mp4')}
           autoPlay
           muted
           loop

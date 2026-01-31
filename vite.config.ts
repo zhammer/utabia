@@ -10,10 +10,17 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        app: resolve(__dirname, 'app.html'),
         background: resolve(__dirname, 'src/background.ts')
       },
       output: {
-        entryFileNames: '[name].js'
+        entryFileNames: (chunkInfo) => {
+          // Keep background.js at root for Chrome extension
+          if (chunkInfo.name === 'background') {
+            return '[name].js'
+          }
+          return 'assets/[name]-[hash].js'
+        }
       }
     }
   }
