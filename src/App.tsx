@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import WavesBackground from './components/WavesBackground'
 import TabField from './components/TabField'
 import LaserManager from './components/LaserManager'
+import { AudioProvider } from './contexts/AudioContext'
 
 export default function App() {
   const tabFieldRef = useRef<{ hitTab: (instanceId: string) => boolean } | null>(null)
@@ -11,6 +12,7 @@ export default function App() {
   }, [])
 
   return (
+    <AudioProvider>
     <div className="app">
       {/* SVG filters for pixelation effect */}
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
@@ -59,5 +61,6 @@ export default function App() {
         )}
       </LaserManager>
     </div>
+    </AudioProvider>
   )
 }

@@ -1,4 +1,5 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
+import { useAudio } from '../contexts/AudioContext'
 
 interface WavesBackgroundProps {
   onReady?: () => void
@@ -23,7 +24,7 @@ function SpeakerIcon({ isOn }: { isOn: boolean }) {
 export default function WavesBackground({ onReady }: WavesBackgroundProps) {
   const basePath = import.meta.env.BASE_URL || './'
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [isMuted, setIsMuted] = useState(true)
+  const { isMuted, setIsMuted } = useAudio()
 
   useEffect(() => {
     if (videoRef.current) {
@@ -31,11 +32,14 @@ export default function WavesBackground({ onReady }: WavesBackgroundProps) {
     }
   }, [])
 
-  const toggleMute = () => {
+  useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted
-      setIsMuted(videoRef.current.muted)
+      videoRef.current.muted = isMuted
     }
+  }, [isMuted])
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted)
   }
 
   return (

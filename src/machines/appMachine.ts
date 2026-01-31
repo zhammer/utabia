@@ -79,7 +79,7 @@ const spawnTimerLogic = fromCallback(({ sendBack }) => {
 const utabiaTimerLogic = fromCallback(({ sendBack }) => {
   const timeout = setTimeout(() => {
     sendBack({ type: "SHOW_MESSAGE" });
-  }, 5e3);
+  }, 10e3);
   return () => clearTimeout(timeout);
 });
 
