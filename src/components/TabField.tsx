@@ -82,7 +82,8 @@ const TabField = forwardRef<TabFieldHandle, TabFieldProps>(
       []
     );
 
-    const isShowingMessage = state.matches({ utabia: "showingMessage" });
+    const isShowingUtabia = state.matches({ utabia: "active" }) || state.matches({ utabia: "exiting" });
+    const isExiting = state.matches({ utabia: "exiting" });
 
     return (
       <div className="tab-field" onClick={handleClick}>
@@ -100,7 +101,7 @@ const TabField = forwardRef<TabFieldHandle, TabFieldProps>(
             }
           />
         ))}
-        {isShowingMessage && <UtabiaScene />}
+        {isShowingUtabia && <UtabiaScene isExiting={isExiting} />}
       </div>
     );
   }

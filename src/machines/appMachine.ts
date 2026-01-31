@@ -78,7 +78,7 @@ const spawnTimerLogic = fromCallback(({ sendBack }) => {
 
 const utabiaTimerLogic = fromCallback(({ sendBack }) => {
   const timeout = setTimeout(() => {
-    sendBack({ type: "SHOW_MESSAGE" });
+    sendBack({ type: "SHOW_SCENE" });
   }, 10e3);
   return () => clearTimeout(timeout);
 });
@@ -181,7 +181,7 @@ export const appMachine = createMachine({
       initial: "waiting",
       on: {
         SET_TABS: {
-          target: "running",
+          target: ".exiting",
           guard: ({ event }) => event.tabs.length > 0,
           actions: assign({
             queue: ({ event }) =>
@@ -196,10 +196,15 @@ export const appMachine = createMachine({
             src: utabiaTimerLogic,
           },
           on: {
-            SHOW_MESSAGE: "showingMessage",
+            SHOW_SCENE: "active",
           },
         },
-        showingMessage: {},
+        active: {},
+        exiting: {
+          after: {
+            9000: "#app.running",
+          },
+        },
       },
     },
   },

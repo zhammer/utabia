@@ -1,7 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
 import { useAudio } from '../contexts/AudioContext'
 
-export default function UtabiaScene() {
+interface UtabiaSceneProps {
+  isExiting?: boolean
+}
+
+export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
   const basePath = import.meta.env.BASE_URL || './'
   const [isVisible, setIsVisible] = useState(false)
   const [showTitle, setShowTitle] = useState(false)
@@ -65,8 +69,28 @@ export default function UtabiaScene() {
     }
   }, [isMuted])
 
+  // Handle exit animation - fade out music
+  useEffect(() => {
+    if (!isExiting || !audioRef.current) return
+
+    // Clear any existing fade
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current)
+    }
+
+    // Fade out over 9 seconds
+    fadeIntervalRef.current = window.setInterval(() => {
+      if (audioRef.current && audioRef.current.volume > 0) {
+        audioRef.current.volume = Math.max(0, audioRef.current.volume - 0.005)
+      } else if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current)
+        fadeIntervalRef.current = null
+      }
+    }, 90)
+  }, [isExiting])
+
   return (
-    <div className={`utabia-scene ${isVisible ? 'visible' : ''}`}>
+    <div className={`utabia-scene ${isVisible ? 'visible' : ''} ${isExiting ? 'exiting' : ''}`}>
       {/* Raye on empty tab */}
       <div className="utabia-raye-container">
         <div className="utabia-raye-inner">

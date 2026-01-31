@@ -300,7 +300,7 @@ html, body, #root {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  animation: utabiaDriftIn 6s ease-out forwards;
+  animation: utabiaDriftIn 9s ease-out forwards;
 }
 
 @keyframes utabiaDriftIn {
@@ -311,6 +311,34 @@ html, body, #root {
   to {
     opacity: 1;
     left: 50%;
+  }
+}
+
+.utabia-scene.exiting .utabia-raye-container {
+  animation: utabiaDriftOut 9s ease-in forwards;
+}
+
+.utabia-scene.exiting .utabia-message {
+  animation: utabiaTextFadeOut 2s ease-out forwards;
+}
+
+@keyframes utabiaDriftOut {
+  from {
+    opacity: 1;
+    left: 50%;
+  }
+  to {
+    opacity: 0;
+    left: 120%;
+  }
+}
+
+@keyframes utabiaTextFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
