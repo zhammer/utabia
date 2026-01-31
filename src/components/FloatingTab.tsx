@@ -61,6 +61,7 @@ export default function FloatingTab({ tab, instanceId, x, y, onGone, onClosed, o
           />
         )}
         <span className="tab-title">{displayTitle}</span>
+        <span className="tab-close">×</span>
       </div>
     </div>
   )

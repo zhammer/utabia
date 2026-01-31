@@ -1,55 +1,61 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from "react";
 
 interface LaserEffectProps {
-  targetX: number
-  targetY: number
-  color: string
-  onHit: () => void
-  onComplete: () => void
+  targetX: number;
+  targetY: number;
+  color: string;
+  onHit: () => void;
+  onComplete: () => void;
 }
 
-export default function LaserEffect({ targetX, targetY, color, onHit, onComplete }: LaserEffectProps) {
-  const [progress, setProgress] = useState(0)
-  const hasHitRef = useRef(false)
+export default function LaserEffect({
+  targetX,
+  targetY,
+  color,
+  onHit,
+  onComplete,
+}: LaserEffectProps) {
+  const [progress, setProgress] = useState(0);
+  const hasHitRef = useRef(false);
 
-  const totalDuration = 600 // ms total animation
-  const hitAt = 0.4 // hit happens 40% through (~240ms delay)
+  const totalDuration = 600; // ms total animation
+  const hitAt = 0.5; // hit happens 60% through (~360ms delay)
 
   useEffect(() => {
-    const startTime = performance.now()
-    let animationId: number
+    const startTime = performance.now();
+    let animationId: number;
 
     const tick = (currentTime: number) => {
-      const elapsed = currentTime - startTime
-      const p = Math.min(elapsed / totalDuration, 1)
+      const elapsed = currentTime - startTime;
+      const p = Math.min(elapsed / totalDuration, 1);
       // Ease out for smooth fade
-      const eased = 1 - Math.pow(1 - p, 2)
+      const eased = 1 - Math.pow(1 - p, 2);
 
-      setProgress(eased)
+      setProgress(eased);
 
       // Trigger hit partway through to simulate depth
       if (p >= hitAt && !hasHitRef.current) {
-        hasHitRef.current = true
-        onHit()
+        hasHitRef.current = true;
+        onHit();
       }
 
       if (p >= 1) {
-        onComplete()
+        onComplete();
       } else {
-        animationId = requestAnimationFrame(tick)
+        animationId = requestAnimationFrame(tick);
       }
-    }
+    };
 
-    animationId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(animationId)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    animationId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationId);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Start at full size, shrink to nothing
-  const scale = 1 - progress
+  const scale = 1 - progress;
   // Fade out as it shrinks
-  const opacity = 1 - progress
+  const opacity = 1 - progress;
 
-  const glowSize = 15 * scale
+  const glowSize = 15 * scale;
 
   return (
     <div
@@ -63,5 +69,5 @@ export default function LaserEffect({ targetX, targetY, color, onHit, onComplete
         opacity,
       }}
     />
-  )
+  );
 }
