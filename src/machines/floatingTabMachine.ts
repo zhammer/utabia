@@ -45,7 +45,7 @@ export const floatingTabMachine = createMachine({
     },
     disintegrating: {
       after: {
-        500: 'closed'
+        900: 'closed'
       }
     },
     closed: {

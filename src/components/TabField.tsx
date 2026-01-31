@@ -32,9 +32,9 @@ const TabField = forwardRef<TabFieldHandle, TabFieldProps>(({ onShoot }, ref) =>
     const x = e.clientX
     const y = e.clientY
 
-    // Check if clicked on a tab
+    // Check if clicked on a tab (exclude fading-out tabs)
     const target = e.target as HTMLElement
-    const tabElement = target.closest('.floating-tab')
+    const tabElement = target.closest('.floating-tab:not(.fading-out)')
     const instanceId = tabElement?.getAttribute('data-instance-id') || undefined
 
     onShoot(x, y, instanceId)
