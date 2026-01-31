@@ -2,9 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  base: './',
+  base: command === 'build' ? './' : '/',
   build: {
     outDir: 'dist',
     rollupOptions: {
@@ -24,4 +24,4 @@ export default defineConfig({
       }
     }
   }
-})
+}))
