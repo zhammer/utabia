@@ -1,6 +1,15 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { useAudio } from '../contexts/AudioContext'
 import { getAssetUrl } from '../config'
+
+interface Particle {
+  id: number
+  x: number
+  y: number
+  size: number
+  speed: number
+  opacity: number
+}
 
 interface UtabiaSceneProps {
   isExiting?: boolean
@@ -9,9 +18,50 @@ interface UtabiaSceneProps {
 export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [showTitle, setShowTitle] = useState(false)
+  const [particles, setParticles] = useState<Particle[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const fadeIntervalRef = useRef<number | null>(null)
+  const particleIdRef = useRef(0)
   const { isMuted } = useAudio()
+
+  // Initialize particles
+  useEffect(() => {
+    const initialParticles: Particle[] = []
+    for (let i = 0; i < 20; i++) {
+      initialParticles.push({
+        id: particleIdRef.current++,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 2 + Math.random() * 4,
+        speed: 0.5 + Math.random() * 1.5,
+        opacity: 0.3 + Math.random() * 0.5,
+      })
+    }
+    setParticles(initialParticles)
+  }, [])
+
+  // Animate particles
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setParticles(prev => prev.map(p => {
+        let newX = p.x - p.speed
+        // Reset particle to right side when it goes off screen
+        if (newX < -5) {
+          return {
+            ...p,
+            x: 105,
+            y: Math.random() * 100,
+            size: 2 + Math.random() * 4,
+            speed: 0.5 + Math.random() * 1.5,
+            opacity: 0.3 + Math.random() * 0.5,
+          }
+        }
+        return { ...p, x: newX }
+      }))
+    }, 50)
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Create and start audio on mount
   useEffect(() => {
@@ -91,6 +141,23 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
 
   return (
     <div className={`utabia-scene ${isVisible ? 'visible' : ''} ${isExiting ? 'exiting' : ''}`}>
+      {/* Floating particles */}
+      <div className="utabia-particles">
+        {particles.map(p => (
+          <div
+            key={p.id}
+            className="utabia-particle"
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              opacity: p.opacity,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Raye on empty tab */}
       <div className="utabia-raye-container">
         <div className="utabia-raye-inner">
