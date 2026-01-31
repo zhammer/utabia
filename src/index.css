@@ -382,21 +382,25 @@ html, body, #root {
   image-rendering: pixelated;
 }
 
-/* Floating particles for journey effect */
-.utabia-particles {
+/* Floating particles around Raye */
+.utabia-particles-local {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 200px;
+  pointer-events: none;
 }
 
 .utabia-particle {
   position: absolute;
   background: white;
-  border-radius: 50%;
   pointer-events: none;
+}
+
+.utabia-particles-front {
+  z-index: 10;
 }
 
 

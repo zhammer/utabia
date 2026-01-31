@@ -4,11 +4,12 @@ import { getAssetUrl } from '../config'
 
 interface Particle {
   id: number
-  x: number
-  y: number
+  x: number  // relative to Raye's center (-150 to 150 px range)
+  y: number  // relative to Raye's center
   size: number
   speed: number
-  opacity: number
+  baseOpacity: number
+  inFront: boolean  // whether particle passes in front of Raye
 }
 
 interface UtabiaSceneProps {
@@ -24,36 +25,49 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
   const particleIdRef = useRef(0)
   const { isMuted } = useAudio()
 
-  // Initialize particles
+  // Initialize particles around Raye
   useEffect(() => {
     const initialParticles: Particle[] = []
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
       initialParticles.push({
         id: particleIdRef.current++,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 2 + Math.random() * 4,
-        speed: 0.5 + Math.random() * 1.5,
-        opacity: 0.3 + Math.random() * 0.5,
+        x: (Math.random() - 0.5) * 900,  // -450 to 450 px from center
+        y: (Math.random() - 0.5) * 200,  // -100 to 100 px from center
+        size: 2 + Math.random() * 3,
+        speed: 3 + Math.random() * 5,
+        baseOpacity: 0.4 + Math.random() * 0.4,
+        inFront: Math.random() < 0.3,  // 30% pass in front
       })
     }
     setParticles(initialParticles)
   }, [])
 
-  // Animate particles
+  // Calculate opacity based on distance from center (fades at edges)
+  const getParticleOpacity = (x: number, y: number, baseOpacity: number) => {
+    const distance = Math.sqrt(x * x + y * y)
+    const maxDistance = 120
+    const fadeStart = 60
+    if (distance < fadeStart) return baseOpacity
+    if (distance > maxDistance) return 0
+    // Smooth fade from fadeStart to maxDistance
+    return baseOpacity * (1 - (distance - fadeStart) / (maxDistance - fadeStart))
+  }
+
+  // Animate particles - they drift from right to left through Raye's space
   useEffect(() => {
     const interval = setInterval(() => {
       setParticles(prev => prev.map(p => {
         let newX = p.x - p.speed
-        // Reset particle to right side when it goes off screen
-        if (newX < -5) {
+        // Reset particle to right side when it drifts too far left
+        if (newX < -450) {
           return {
             ...p,
-            x: 105,
-            y: Math.random() * 100,
-            size: 2 + Math.random() * 4,
-            speed: 0.5 + Math.random() * 1.5,
-            opacity: 0.3 + Math.random() * 0.5,
+            x: 450,
+            y: (Math.random() - 0.5) * 200,
+            size: 2 + Math.random() * 3,
+            speed: 3 + Math.random() * 5,
+            baseOpacity: 0.4 + Math.random() * 0.4,
+            inFront: Math.random() < 0.3,
           }
         }
         return { ...p, x: newX }
@@ -141,25 +155,24 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
 
   return (
     <div className={`utabia-scene ${isVisible ? 'visible' : ''} ${isExiting ? 'exiting' : ''}`}>
-      {/* Floating particles */}
-      <div className="utabia-particles">
-        {particles.map(p => (
-          <div
-            key={p.id}
-            className="utabia-particle"
-            style={{
-              left: `${p.x}%`,
-              top: `${p.y}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              opacity: p.opacity,
-            }}
-          />
-        ))}
-      </div>
-
       {/* Raye on empty tab */}
       <div className="utabia-raye-container">
+        {/* Floating particles behind Raye */}
+        <div className="utabia-particles-local">
+          {particles.filter(p => !p.inFront).map(p => (
+            <div
+              key={p.id}
+              className="utabia-particle"
+              style={{
+                left: `${450 + p.x}px`,
+                top: `${100 + p.y}px`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                opacity: getParticleOpacity(p.x, p.y, p.baseOpacity),
+              }}
+            />
+          ))}
+        </div>
         <div className="utabia-raye-inner">
           <div className="utabia-empty-tab">
             <div className="tab-content">
@@ -171,6 +184,22 @@ export default function UtabiaScene({ isExiting = false }: UtabiaSceneProps) {
             alt="Raye"
             className="utabia-raye"
           />
+        </div>
+        {/* Floating particles in front of Raye */}
+        <div className="utabia-particles-local utabia-particles-front">
+          {particles.filter(p => p.inFront).map(p => (
+            <div
+              key={p.id}
+              className="utabia-particle"
+              style={{
+                left: `${450 + p.x}px`,
+                top: `${100 + p.y}px`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                opacity: getParticleOpacity(p.x, p.y, p.baseOpacity),
+              }}
+            />
+          ))}
         </div>
       </div>
 
