@@ -2,7 +2,7 @@
 
 times explicitly forbade... these galleries
 
-[!scratchpad screenshot of my desktop during ideation](docs/assets/scratchpad.png)
+![scratchpad screenshot of my desktop during ideation](docs/assets/scratchpad.png)
 
 ## credits
 
