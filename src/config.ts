@@ -1,6 +1,6 @@
 // CDN URL for large assets (video, audio)
 // In development, use local files. In production extension, use CDN.
-const CDN_URL = 'https://utabia.vercel.app'
+const CDN_URL = 'https://utabia.com'
 
 // Check if running as Chrome extension
 const isExtension = typeof chrome !== 'undefined' && chrome.runtime?.id
