@@ -73,6 +73,7 @@ html, body, #root {
   color: #fff;
   opacity: 0.9;
   margin-bottom: 48px;
+  text-align: center;
 }
 
 .landing-cta {
@@ -122,4 +123,26 @@ html, body, #root {
   border-radius: 50%;
   z-index: 100;
   pointer-events: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .landing-title {
+    font-size: 36px;
+    margin-bottom: 24px;
+  }
+
+  .landing-tagline {
+    font-size: 12px;
+    margin-bottom: 32px;
+  }
+
+  .landing-content {
+    padding: 24px;
+  }
+
+  .landing-cta {
+    font-size: 10px;
+    padding: 14px 24px;
+  }
 }
