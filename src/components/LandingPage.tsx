@@ -42,7 +42,7 @@ export default function LandingPage() {
         <h1 className="landing-title">Utabia</h1>
         <p className="landing-tagline">The modern way to clear tabs.</p>
         <a
-          href="#"
+          href="https://chromewebstore.google.com/detail/utabia/mjoooboiicdfdckjkdlcnofjdodciamb"
           className="landing-cta"
           onClick={(e) => e.stopPropagation()}
         >
